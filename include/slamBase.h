@@ -43,7 +43,7 @@ using namespace cv;
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
-// 相似内参结构
+// 相机内参结构
 struct CAMERA_INTRINSIC_PARAMETERS
 {
     double cx, cy, fx, fy, scale;
@@ -113,7 +113,7 @@ public:
             }
 
             int pos = str.find("=");    // “=”为分界线
-            if (pos == -1)
+            if (pos == -1)      // 行中没有“=”，默认无效
                 continue;
             string key = str.substr(0, pos);    // 分界线以前是关键字
             string value = str.substr(pos+1, str.length()); // 分界线以后是关键字的值

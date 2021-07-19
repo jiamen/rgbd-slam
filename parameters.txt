@@ -13,17 +13,29 @@ camera.cy=253.5;
 camera.fx=518.0;
 camera.fy=519.0;
 camera.scale=1000.0;
+##camera.cx=634.6;
+##camera.cy=367.5;
+##camera.fx=905.3;
+##camera.fy=906.1;
+
 
 # part 5 
 # 数据相关
 # 起始与终止索引
 start_index=1
 end_index=780
+##end_index=815
 # 数据所在目录
 rgb_dir=/home/zlc/WorkCode/rgbd-slam/data/rgb_png/
+##rgb_dir=/home/zlc/Documents/rosImage/rgb_png/
+##rgb_extension=.jpg
 rgb_extension=.png
 depth_dir=/home/zlc/WorkCode/rgbd-slam/data/depth_png/
+##depth_dir=/home/zlc/Documents/rosImage/depth_png/
 depth_extension=.png
+
+
+
 # 点云分辨率
 voxel_grid=0.01
 # 是否实时可视化

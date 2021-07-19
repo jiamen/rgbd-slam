@@ -5,6 +5,7 @@
 
 using namespace cv;
 
+// 将RGB图像像素转换为点云
 PointCloud::Ptr image2PointCloud(cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera)
 {
     PointCloud::Ptr cloud(new PointCloud);
@@ -92,11 +93,11 @@ RESULT_OF_PNP estimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
     static ParameterReader pd;
     vector<cv::DMatch> matches;     // 存储匹配点
 
-    // 第1步：对两针的特征点使用Hamming距离进行暴力匹配
+    // 第1步：对两帧的特征点使用Hamming距离进行暴力匹配
     cv::BFMatcher matcher;
     matcher.match(frame1.desp, frame2.desp, matches);
 
-    // 第2步：匹配点对筛选
+    // 第2步：匹配点对筛选：找出最小匹配距离，并进行数量检查
     RESULT_OF_PNP result;           // 待返回值
     vector<cv::DMatch> goodMatches; // 存储好的匹配点
     double minDis = 9999;
@@ -111,8 +112,8 @@ RESULT_OF_PNP estimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
 
     for (size_t i=0; i<matches.size(); i ++)
     {
-        if (matches[i].distance < max(30.0, good_match_threshold*minDis))      // 工程经验
-        // if (matches[i].distance < good_match_threshold*minDis)      // 工程经验
+        // if (matches[i].distance < max(30.0, good_match_threshold*minDis))      // 工程经验
+        if (matches[i].distance < good_match_threshold*minDis)      // 工程经验
             goodMatches.push_back(matches[i]);
     }
     if (goodMatches.size() <= 5)
@@ -185,8 +186,8 @@ Eigen::Isometry3d cvMat2Eigen(cv::Mat& rvec, cv::Mat& tvec)
     Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
 
     Eigen::AngleAxisd angle(r);     // 直接使用旋转矩阵来对旋转向量赋值
-    T = angle;
-    T(0, 3) = tvec.at<double>(0, 0);        // 矩阵右上角的元素
+    T = angle;                      // “=”重载，使用旋转向量初始化变换矩阵旋转矩阵部分
+    T(0, 3) = tvec.at<double>(0, 0);        // 矩阵右上角的元素，这里开始平移部分
     T(1, 3) = tvec.at<double>(1, 0);
     T(2, 3) = tvec.at<double>(2, 0);
 
@@ -202,8 +203,8 @@ PointCloud::Ptr jointPointCloud(PointCloud::Ptr original, FRAME& newFrame, Eigen
 
     // 合并点云
     PointCloud::Ptr output(new PointCloud());
-    pcl::transformPointCloud(*original, *output, T.matrix());
-    *newCloud += *output;
+    pcl::transformPointCloud(*original, *output, T.matrix());       // 将原始点云变换到当前帧坐标系下
+    *newCloud += *output;                   // 拼接融合
 
 
     // Voxel grid 滤波降采样

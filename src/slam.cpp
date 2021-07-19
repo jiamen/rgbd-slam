@@ -84,7 +84,7 @@ int main(int argc, char* *argv)
     linearSolver->setBlockOrdering( false );
     // 第2步：创建BlockSolver，并用上面定义的线性求解器初始化
     SlamBlockSolver* blockSolver = new SlamBlockSolver( std::unique_ptr<SlamBlockSolver::LinearSolverType>(linearSolver) );
-    // SlamBlockSolver* blockSolver = new SlamBlockSolver( linearSolver );
+        // SlamBlockSolver* blockSolver = new SlamBlockSolver( linearSolver );
     // 第3步：创建总求解器solver，并从GN，LM，Dogleg中选一个，再用上述块求解器BlockSolver初始化
     g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(std::unique_ptr<SlamBlockSolver>(blockSolver));
     // g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg( blockSolver );
@@ -122,7 +122,7 @@ int main(int argc, char* *argv)
                 break;
             case TOO_FAR_AWAY:
                 // 太远了，可能出错了
-                cout << RED"Too far away, mey be ab error." << endl;
+                cout << RED"Too far away, may be an error." << endl;
                 break;
             case TOO_CLOSE:
                 // 太近了，直接跳过
@@ -159,7 +159,6 @@ int main(int argc, char* *argv)
     cout << "Optimization done." << endl;
 
 
-
     /*
      * 拼接点云地图
      * */
@@ -183,7 +182,7 @@ int main(int argc, char* *argv)
         Eigen::Isometry3d pose = vertex->estimate();        // 该帧优化后的位姿
         PointCloud::Ptr newCloud = image2PointCloud(keyframes[i].rgb, keyframes[i].depth, camera);  // 转成点云
 
-        // 以下是滤波
+        // 以下是两种滤波操作，分别是网格滤波器和区间滤波
         voxel.setInputCloud(newCloud);
         voxel.filter(*tmp);
         pass.setInputCloud(tmp);
@@ -192,6 +191,7 @@ int main(int argc, char* *argv)
         // 把点云变换后加入到全局地图中
         pcl::transformPointCloud(*newCloud, *tmp, pose.matrix());
         *output += *tmp;
+
         tmp->clear();
         newCloud->clear();
     }
@@ -209,6 +209,7 @@ int main(int argc, char* *argv)
 }
 
 
+// 读取一帧rgb图像和对应的深度depth图
 FRAME readFrame(int index, ParameterReader& pd)
 {
     FRAME f;
@@ -275,7 +276,7 @@ CHECK_RESULT checkKeyframes(FRAME& f1, FRAME& f2, g2o::SparseOptimizer& opti, bo
 
 
     // 向g2o中增加这个顶点与上一帧联系的边
-    // 顶点部分：顶点只需设定id即可
+    // ① 顶点部分：顶点只需设定id即可
     if (is_loops == false)
     {
         g2o::VertexSE3* v = new g2o::VertexSE3();
@@ -284,7 +285,7 @@ CHECK_RESULT checkKeyframes(FRAME& f1, FRAME& f2, g2o::SparseOptimizer& opti, bo
         opti.addVertex(v);
     }
 
-    // 边部分
+    // ② 边部分
     g2o::EdgeSE3* edge = new g2o::EdgeSE3();
     edge->setVertex(0, opti.vertex(f1.frameID));    // 连接此边的两个顶点id
     edge->setVertex(1, opti.vertex(f2.frameID));
@@ -313,6 +314,7 @@ CHECK_RESULT checkKeyframes(FRAME& f1, FRAME& f2, g2o::SparseOptimizer& opti, bo
 }
 
 
+// 检测近距离的回环
 void checkNearbyLoops(vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimizer& opti)
 {
     static ParameterReader pd;
@@ -337,7 +339,7 @@ void checkNearbyLoops(vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimi
     }
 }
 
-
+// 随机检测回环
 void checkRandomLoops(vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimizer& opti)
 {
     static ParameterReader pd;
@@ -358,7 +360,7 @@ void checkRandomLoops(vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimi
         // randomly check loops
         for (int i=0; i<random_loops; i ++)
         {
-            int index = rand()%frames.size();
+            int index = rand() % frames.size();
             checkKeyframes(frames[index], currFrame, opti, true);
         }
     }
