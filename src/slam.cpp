@@ -84,7 +84,7 @@ int main(int argc, char* *argv)
     linearSolver->setBlockOrdering( false );
     // 第2步：创建BlockSolver，并用上面定义的线性求解器初始化
     SlamBlockSolver* blockSolver = new SlamBlockSolver( std::unique_ptr<SlamBlockSolver::LinearSolverType>(linearSolver) );
-        // SlamBlockSolver* blockSolver = new SlamBlockSolver( linearSolver );
+    // SlamBlockSolver* blockSolver = new SlamBlockSolver( linearSolver );
     // 第3步：创建总求解器solver，并从GN，LM，Dogleg中选一个，再用上述块求解器BlockSolver初始化
     g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(std::unique_ptr<SlamBlockSolver>(blockSolver));
     // g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg( blockSolver );

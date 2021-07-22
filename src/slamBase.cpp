@@ -85,7 +85,7 @@ void computeKeyPointsAndDesp(FRAME& frame, string detector, string descriptor)
 }
 
 
-// estimateMotion 计算两个帧之间的运动
+// estimateMotion 使用3d-2dPnP来，计算两个帧之间的运动
 // 输入：帧1和帧2
 // 输出：rvec 和 tvec
 RESULT_OF_PNP estimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera)
