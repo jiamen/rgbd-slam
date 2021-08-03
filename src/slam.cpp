@@ -268,7 +268,7 @@ CHECK_RESULT checkKeyframes(FRAME& f1, FRAME& f2, g2o::SparseOptimizer& opti, bo
     }
     else
     {
-        if (norm >= max_norm_lp)
+        if (norm >= max_norm_lp)    // max_norm_lp = 2.0
             return TOO_FAR_AWAY;
     }
     if (norm <= keyframe_threshold)

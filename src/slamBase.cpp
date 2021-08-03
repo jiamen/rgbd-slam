@@ -158,11 +158,10 @@ RESULT_OF_PNP estimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
     cv::Mat cameraMatrix(3, 3, CV_64F, camera_matrix_data);     // 构建相机矩阵，cv::Mat类型的矩阵
     cv::Mat rvec, tvec, inliers;
 
-
-    // 第4步：求解PnP
+    // 第4步：求解PnP    上一帧下的三维点  本帧下的二维点                        无初始估计值，这里是两帧之间的变换
     cv::solvePnPRansac(pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 0.99, inliers);
 
-    result.rvec = rvec;
+    result.rvec = rvec;     // 求得的是R_21
     result.tvec = tvec;
     result.inliers = inliers.rows;      // 记录内点数量
 
